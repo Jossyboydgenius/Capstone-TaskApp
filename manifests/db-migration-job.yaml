@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  namespace: taskapp
+spec:
+  template:
+    metadata:
+      labels:
+        job: db-migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migration
+          image: ghcr.io/ts-a-devops/taskapp-backend:v1.0.0-mock
+          imagePullPolicy: IfNotPresent
+          command: ["flask", "db", "upgrade"]
+          # Alternatively: ["alembic", "upgrade", "head"]
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: taskapp-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: taskapp-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: taskapp-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: taskapp-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskapp-secrets
+                  key: DB_PASSWORD
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: taskapp-secrets
+                  key: SECRET_KEY
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+  backoffLimit: 4

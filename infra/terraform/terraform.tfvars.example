@@ -1,0 +1,24 @@
+# AWS Region to deploy the infrastructure
+aws_region = "us-east-1"
+
+# Availability Zone
+availability_zone = "us-east-1a"
+
+# Environment tagging identifier
+env = "phoenix-capstone"
+
+# The name of the AWS EC2 Key Pair to use for SSH access
+key_name = "your-aws-ssh-key-name"
+
+# Number of worker nodes to provision
+agent_count = 2
+
+# Instance size for VMs (t3.small has 2 vCPUs and 2GB RAM, sufficient for lightweight k3s node)
+instance_type = "t3.small"
+
+# Ubuntu 22.04 LTS AMI in us-east-1 (check latest or replace with your preferred region's AMI)
+ami_id = "ami-0c7217cdde317cfec"
+
+# CRITICAL: The public IP address of your administrator workstation in CIDR format
+# This restricts SSH (22) and Kubernetes API (6443) access to your IP only!
+admin_ip = "198.51.100.42/32"

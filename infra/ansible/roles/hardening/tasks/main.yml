@@ -1,0 +1,58 @@
+---
+- name: Update apt cache and upgrade system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+  tags: [system, packages]
+
+- name: Install system security and utility packages
+  apt:
+    name:
+      - curl
+      - ufw
+      - fail2ban
+      - git
+      - software-properties-common
+    state: present
+  tags: [system, packages]
+
+- name: Ensure SSH key authorization is enforced
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: Restart SSH
+  tags: [ssh]
+
+- name: Allow all traffic from the internal VPC CIDR
+  ufw:
+    rule: allow
+    src: 10.0.0.0/16
+  tags: [firewall]
+
+- name: Allow SSH (we rely on AWS SG for public IP restriction)
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+  tags: [firewall]
+
+- name: Allow HTTP
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+  tags: [firewall]
+
+- name: Allow HTTPS
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  tags: [firewall]
+
+- name: Enable UFW firewall
+  ufw:
+    state: enabled
+    policy: deny
+  tags: [firewall]
