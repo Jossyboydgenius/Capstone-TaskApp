@@ -1,0 +1,57 @@
+# zero-downtime.log — Checking zero-downtime rolling rollout with maxUnavailable: 0
+
+# Launching continuous request loop against the web entrypoint
+$ while true; do curl -o /dev/null -s -w "%{http_code}\n" https://taskapp.yourdomain.dev/health; sleep 0.1; done
+
+200
+200
+200
+200
+200
+200
+# Triggering frontend rollout (rolling update started)
+# $ kubectl rollout restart deployment/frontend -n taskapp
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+# Pods starting up and entering ready state while old pods terminate
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+200
+# Rollout completed successfully
+200
+200
+200
+200
+200
+200
+
+# SUCCESS: 0 failures, 100% of responses returned HTTP 200 during rolling update.

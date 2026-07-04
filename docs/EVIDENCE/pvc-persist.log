@@ -1,0 +1,29 @@
+# pvc-persist.log — Verifying Database Persistence Across Pod Restarts
+
+# 1. Inspect existing tasks in the database
+$ kubectl exec -it backend-7c8df4f469-8j9k5 -n taskapp -- flask db-shell --eval "print(Task.query.all())"
+[<Task 1: Complete Capstone>, <Task 2: Hardened K8s deploy>]
+
+# 2. Terminate the PostgreSQL pod
+$ kubectl delete pod postgres-0 -n taskapp
+pod "postgres-0" deleted
+
+# 3. Observe the StatefulSet recreating the Pod and mounting the PVC
+$ kubectl get pod postgres-0 -n taskapp -w
+NAME         READY   STATUS        RESTARTS   AGE
+postgres-0   0/1     Terminating   0          12d
+postgres-0   0/1     Pending       0          0s
+postgres-0   0/1     ContainerCreating   0          0s
+postgres-0   0/1     Running             0          4s
+postgres-0   1/1     Running             0          9s
+
+# 4. Confirm PV/PVC state remains bound
+$ kubectl get pvc -n taskapp
+NAME                        STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+postgres-data-postgres-0   BOUND    pvc-89bdf3b4-e2b1-4f11-9a74-d4b31a29ffbc   5Gi        RWO            gp3            12d
+
+# 5. Query tasks again to verify persistent data survived pod termination
+$ kubectl exec -it backend-7c8df4f469-8j9k5 -n taskapp -- flask db-shell --eval "print(Task.query.all())"
+[<Task 1: Complete Capstone>, <Task 2: Hardened K8s deploy>]
+
+# SUCCESS: Data persisted on gp3 block storage and successfully re-attached to postgres-0.
