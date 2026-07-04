@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     # Replace this with the URL of your own Git repository / fork.
-    repoURL: 'https://github.com/your-username/capstone-phoenix.git'
+    repoURL: 'https://github.com/Jossyboydgenius/Capstone-TaskApp.git'
     targetRevision: main
     path: manifests
   destination:
